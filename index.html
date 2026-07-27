@@ -28,6 +28,12 @@
     <input type="hidden" id="line_uid">
     <input type="hidden" id="line_email">
 
+        <!-- 日期/時間 -->
+ <div class="field-group">
+  <label>預約日期/時間 <span class="label-required">*</span></label>
+  <input id="datetime" type="datetime-local" required>
+</div>
+
     <!-- 姓名 -->
     <div class="field-group">
       <label>姓名 <span class="label-required">*</span></label>
@@ -41,13 +47,21 @@
              pattern="09[0-9]{8}" inputmode="numeric">
     </div>
 
-
-    <!-- 日期/時間 -->
- <div class="field-group">
-  <label>預約日期/時間 <span class="label-required">*</span></label>
-  <input id="datetime" type="datetime-local" required>
-</div>
-
+    
+    <!-- 人數 -->
+    <div class="field-group">
+      <label>人數 <span class="label-required">*</span></label>
+      <select id="adult" required>
+        <option value="" disabled selected>請選擇</option>
+        <script>
+          document.write(
+            Array.from({length: 30}, (_, i) => i + 1)
+            .map(n => `<option value="${n}">${n} 位</option>`)
+            .join("")
+          );
+        </script>
+      </select>
+    </div>
 
     <!-- 服務項目 -->
    
@@ -109,21 +123,6 @@
         <option value="" disabled selected>請選擇</option>
         <option>無</option>
         <option>(60分鐘)$1,000</option>
-      </select>
-    </div>
-
-    <!-- 人數 -->
-    <div class="field-group">
-      <label>人數 <span class="label-required">*</span></label>
-      <select id="adult" required>
-        <option value="" disabled selected>請選擇</option>
-        <script>
-          document.write(
-            Array.from({length: 30}, (_, i) => i + 1)
-            .map(n => `<option value="${n}">${n} 位</option>`)
-            .join("")
-          );
-        </script>
       </select>
     </div>
 
