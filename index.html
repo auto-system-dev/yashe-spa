@@ -29,25 +29,10 @@
     <input type="hidden" id="line_email">
 
         <!-- 日期/時間 -->
- <div class="field-group">
+<div class="field-group">
   <label>預約日期/時間 <span class="label-required">*</span></label>
   <input id="datetime" type="datetime-local" required>
-  <span id="ampm"></span>
 </div>
-
-<script>
-  const datetimeInput = document.getElementById('datetime');
-  const ampmSpan = document.getElementById('ampm');
-
-  datetimeInput.addEventListener('change', function() {
-    const value = new Date(this.value);
-    if (!isNaN(value)) {
-      const hours = value.getHours();
-      ampmSpan.textContent = hours < 12 ? '上午' : '下午';
-    }
-  });
-</script>
-
 
     <!-- 姓名 -->
     <div class="field-group">
