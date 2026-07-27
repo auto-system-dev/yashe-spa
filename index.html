@@ -28,62 +28,24 @@
     <input type="hidden" id="line_uid">
     <input type="hidden" id="line_email">
 
-    <div class="field-group">
-  <label>預約時段</label>
-  <div class="tabs">
-    <button class="tab active" data-period="morning">早上</button>
-    <button class="tab" data-period="noon">中午</button>
-    <button class="tab" data-period="evening">晚上</button>
-    <button class="tab" data-period="custom">自選時段</button>
-  </div>
-
-  <div id="time-slots" class="time-slots">
-    <!-- 時間按鈕會由 JS 動態生成 -->
-  </div>
+   <div class="field-group">
+  <label>預約日期 <span class="label-required">*</span></label>
+  <input id="date" type="date" required>
 </div>
 
-<script>
-  const timeSlots = {
-    morning: ["09:00", "09:30", "10:00", "10:30", "11:00"],
-    noon: ["14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"],
-    evening: ["18:00", "18:30", "19:00", "19:30", "20:00"],
-  };
+     <div class="field-group">
+      <label>預約時段</label>
+      <select id="project1" required>
+        <option value="" disabled selected>請選擇</option>
+        <option>早上</option>
+        <option>下午</option>
+        <option>晚上</option>
+        </select>
+    </div>
 
-  const tabs = document.querySelectorAll(".tab");
-  const slotContainer = document.getElementById("time-slots");
-
-  function renderSlots(period) {
-    slotContainer.innerHTML = "";
-    timeSlots[period]?.forEach(time => {
-      const btn = document.createElement("button");
-      btn.textContent = time;
-      btn.className = "slot-btn";
-      btn.onclick = () => alert(`已選擇 ${time}`);
-      slotContainer.appendChild(btn);
-    });
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      renderSlots(tab.dataset.period);
-    });
-  });
-
-  renderSlots("morning"); // 預設顯示早上
-</script>
-
-<style>
-  .tabs button.active { background-color: #00aaff; color: white; }
-  .slot-btn { margin: 5px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
-</style>
-
-
-        <!-- 日期/時間 -->
 <div class="field-group">
-  <label>預約日期/時間 <span class="label-required">*</span></label>
-  <input id="datetime" type="datetime-local" required>
+  <label>預約時間 <span class="label-required">*</span></label>
+  <input id="time" type="time" required>
 </div>
 
     <!-- 姓名 -->
