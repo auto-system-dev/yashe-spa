@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LINE 預訂表單</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <!-- 使用共用 style.css -->
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>請填寫以下資料</h2>
+
+  <form id="liffForm">
+
+    <input type="hidden" id="line_uid">
+
+    <!-- 姓名 -->
+    <div class="field-group">
+      <label>姓名（必填）</label>
+      <input type="text" id="name" required />
+    </div>
+
+    <!-- 手機 -->
+    <div class="field-group">
+      <label>手機號碼（必填）</label>
+      <input 
+        type="tel"
+        id="phone"
+        required
+        placeholder="例如：0912345678"
+        pattern="09[0-9]{8}"
+        maxlength="10"
+        inputmode="numeric"
+      />
+    </div>
+
+    <!-- 包棟館別 -->
+    <div class="field-group">
+      <label>包棟館別</label>
+      <select id="house">
+        <option value="皆可">皆可</option>
+        <option value="A棟">A棟</option>
+        <option value="B棟">B棟</option>
+      </select>
+    </div>
+
+    <!-- 包棟日期 -->
+    <div class="field-group">
+      <label>包棟日期（必填）</label>
+      <input type="date" id="date" required />
+    </div>
+
+    <!-- 包棟天數 -->
+    <div class="field-group">
+      <label>包棟天數</label>
+      <select id="days">
+        <option value="1">1 晚</option>
+        <option value="2">2 晚</option>
+        <option value="3">3 晚</option>
+      </select>
+    </div>
+
+    <!-- 大人 6–34 -->
+    <div class="field-group">
+      <label>大人人數（必填）</label>
+      <select id="adult" required>
+        <option value="" disabled selected>請選擇</option>
+        <!-- 自動生成 6–34 -->
+        <script>
+          document.write(
+            Array.from({length: 29}, (_, i) => i + 6)
+            .map(n => `<option value="${n}">${n} 位</option>`)
+            .join("")
+          );
+        </script>
+      </select>
+    </div>
+
+    <!-- 小孩 0–10 -->
+    <div class="field-group">
+      <label>小孩人數（必填）</label>
+      <select id="child" required>
+        <option value="" disabled selected>請選擇</option>
+        <script>
+          document.write(
+            Array.from({length: 11}, (_, i) => i)
+              .map(n => `<option value="${n}">${n} 位</option>`)
+              .join("")
+          );
+        </script>
+      </select>
+    </div>
+
+    <!-- 寵物（文字輸入） -->
+    <div class="field-group">
+      <label>寵物</label>
+      <input type="text" id="pet" placeholder="例如：1隻小狗…" />
+    </div>
+
+    <!-- 備註 -->
+    <div class="field-group">
+      <label>需求內容</label>
+      <textarea id="note" rows="3" placeholder="可填寫備註、特殊需求…"></textarea>
+    </div>
+
+    <button type="submit">送出資料</button>
+
+  </form>
+</div>
+
+<script>
+  async function initLIFF() {
+    await liff.init({ liffId: "2008409020-k4Oy7Y0D" });
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    const profile = await liff.getProfile();
+    document.getElementById("line_uid").value = profile.userId;
+  }
+
+  initLIFF();
+
+  document.getElementById("liffForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const params = new URLSearchParams();
+    params.append("name",  document.getElementById("name").value);
+    params.append("phone", document.getElementById("phone").value);
+    params.append("house", document.getElementById("house").value);
+    params.append("date",  document.getElementById("date").value);
+    params.append("days",  document.getElementById("days").value);
+    params.append("adult", document.getElementById("adult").value);
+    params.append("child", document.getElementById("child").value);
+    params.append("pet",   document.getElementById("pet").value);
+    params.append("note",  document.getElementById("note").value);
+    params.append("uid",   document.getElementById("line_uid").value);
+
+    window.location.href = "resultSend.html?" + params.toString();
+  });
+</script>
+
+</body>
+</html>
