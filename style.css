@@ -1,0 +1,78 @@
+body {
+  font-family: "Noto Sans TC","Microsoft JhengHei",sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.username {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.green-name {
+  color: #06C755;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  font-weight: 900;
+}
+
+.field-group {
+  margin-bottom: 16px;
+}
+
+.field-group label {
+  display: block;
+  font-size: 14px;
+  color: #000;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.label-required {
+  color: #d32f2f;
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 16px;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.date-group {
+  position: relative;
+}
+
+.date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: #06C755;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
+}

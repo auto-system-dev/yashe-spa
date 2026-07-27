@@ -1,83 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>資料送出中...</title>
+<meta charset="UTF-8" />
+<title>資料送出中…</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-  <link rel="stylesheet" href="style.css">
-
-  <style>
-    body { text-align: center; padding: 40px; font-size: 26px; }
-  </style>
+<style>
+  body {
+    font-family: "Noto Sans TC", sans-serif;
+    background: #f2f2f2;
+    text-align: center;
+    padding: 40px;
+    font-size: 20px;
+  }
+</style>
 </head>
 
 <body>
-
-<p>正在處理您的預訂，請稍候…</p>
+<p>正在送出您的預約資料…</p>
 
 <script>
+// ⭐ 你的 GAS 網址
+const API_URL = "https://script.google.com/macros/s/AKfycbzOTOJTDCJNjTW-j_QAzTBQfsVukcIiVLeQwrGjgkmXR1vVQ0XTYdGn0FvovULfFIC0/exec";
+
 (async () => {
 
   await liff.init({
-    liffId: "2008409020-k4Oy7Y0D",
+    liffId: "2008586106-kLrdO1gp",
     withLoginOnExternalBrowser: false
   });
 
+  const url = new URL(location.href);
+
+  const data = {
+    uid:   url.searchParams.get("uid"),
+    name:  url.searchParams.get("name"),
+    phone: url.searchParams.get("phone"),
+    date:  url.searchParams.get("date"),
+    time:  url.searchParams.get("time"),
+    adult: url.searchParams.get("adult"),
+    child: url.searchParams.get("child") || "0",
+    chair: url.searchParams.get("chair") || "0",
+    note:  url.searchParams.get("note") || "無"
+  };
+
+
+  /* ---------------------------
+      1. 寫入 Google Sheet（修正版）
+  ---------------------------- */
+  try {
+   await fetch(API_URL, {
+  method: "POST",
+  body: JSON.stringify(data)
+});
+
+  } catch (e) {
+    console.error("❌ 試算表寫入錯誤:", e);
+  }
+
+
+  /* ---------------------------
+      2. 若不是在 LINE
+  ---------------------------- */
   if (!liff.isInClient()) {
-    document.body.innerHTML = "<p>請在 LINE 中開啟此頁面。</p>";
+    document.body.innerHTML = "<p>資料已送出，請回到 LINE App 查看。</p>";
     return;
   }
 
-  const url = new URL(location.href);
 
-  const name  = url.searchParams.get("name");
-  const phone = url.searchParams.get("phone");
-  const house = url.searchParams.get("house");
-  const date  = url.searchParams.get("date");
-  const days  = url.searchParams.get("days");
-  const adult = url.searchParams.get("adult");
-  const child = url.searchParams.get("child");
-  const pet   = url.searchParams.get("pet") || "無";
-  const note  = url.searchParams.get("note") || "無";
-
-  /* ----------------------------------------------
-     寫入 Google Sheet
-     ---------------------------------------------- */
-  await fetch(
-    "https://script.google.com/macros/s/AKfycbxOGogJosiwQDHVm_pEBogYRtRnyJJdufBxoymfFGnK6FKPfcdfzU5l1jR9ztUkvQG4/exec",
-    {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name, phone, house, date, days, adult, child, pet, note
-      })
-    }
-  );
-
-  /* ----------------------------------------------
-     回傳訊息給使用者
-     ---------------------------------------------- */
+  /* ---------------------------
+      3. 傳文字訊息（不用 Flex）
+  ---------------------------- */
   const msg =
-`📌 您的預訂資料如下：
+`📌 您的預約訂位資訊
 
-👤 姓名：${name}
-📱 手機：${phone}
-🏡 館別：${house}
-📅 包棟日期：${date}
-🌙 包棟天數：${days} 晚
-🧑 大人：${adult} 位
-🧒 小孩：${child} 位
-🐶 寵物：${pet}
-📝 備註：${note}
+👤 姓名：${data.name}
+📱 手機：${data.phone}
+📅 日期：${data.date}
+⏰ 時段：${data.time}
+🧑 大人：${data.adult} 位
+🧒 小孩：${data.child} 位
+🪑 兒童椅：${data.chair} 張
+📝 備註：${data.note}
 
-我們已收到您的資訊，預訂確認中...`;
+我們已收到您的預約，將盡快與您確認訂位！`;
 
-  await liff.sendMessages([
-    { type: "text", text: msg }
-  ]);
+  try {
+    await liff.sendMessages([
+      { type: "text", text: msg }
+    ]);
+  } catch (e) {
+    alert("❌ 訊息發送失敗：" + e);
+    console.error(e);
+  }
 
   liff.closeWindow();
 
