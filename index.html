@@ -1,207 +1,298 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<title>LINE 預約SPA按摩</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>LINE 預約 SPA 按摩</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f4d3f">
 
-<!-- LIFF -->
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
 
-<!-- flatpickr -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
+  <!-- LIFF -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-<link rel="stylesheet" href="style.css">
+  <!-- flatpickr -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
+
+  <link rel="stylesheet" href="liff-spa-form.css">
 </head>
 
 <body>
+  <div class="page">
+    <header class="hero">
+      <p class="hero-eyebrow">SPA Reservation</p>
+      <h1 class="hero-title">預約 SPA 按摩</h1>
+      <p class="hero-sub">請填寫預約資訊，我們會盡快為您確認時段</p>
+      <p class="hero-user" id="displayNameWrap" hidden>
+        您好，<span id="displayName"></span>
+      </p>
+    </header>
 
-<div class="container">
+    <main class="container">
+      <form id="liffForm" class="form-card" novalidate>
+        <input type="hidden" id="line_uid">
+        <input type="hidden" id="line_email">
 
-  <h2>請填寫預約資訊</h2>
+        <section class="form-section">
+          <h2 class="section-title">預約時間</h2>
 
-  <form id="liffForm">
+          <div class="field-group">
+            <label for="date">預約日期 <span class="req">*</span></label>
+            <input id="date" type="text" required placeholder="請選擇日期" inputmode="none" autocomplete="off">
+          </div>
 
-    <!-- 隱藏資料 -->
-    <input type="hidden" id="line_uid">
-    <input type="hidden" id="line_email">
+          <div class="field-row">
+            <div class="field-group">
+              <label for="slot">預約時段 <span class="req">*</span></label>
+              <select id="slot" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="早上">早上</option>
+                <option value="下午">下午</option>
+                <option value="晚上">晚上</option>
+              </select>
+            </div>
 
-   <div class="field-group">
-  <label>預約日期 <span class="label-required">*</span></label>
-  <input id="date" type="date" required>
-</div>
+            <div class="field-group">
+              <label for="time">預約時間 <span class="req">*</span></label>
+              <input id="time" type="time" required>
+            </div>
+          </div>
+        </section>
 
-     <div class="field-group">
-      <label>預約時段<span class="label-required">*</span></label>
-      <select id="project1" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>早上</option>
-        <option>下午</option>
-        <option>晚上</option>
-        </select>
-    </div>
+        <section class="form-section">
+          <h2 class="section-title">基本資料</h2>
 
-<div class="field-group">
-  <label>預約時間 <span class="label-required">*</span></label>
-  <input id="time" type="time" required>
-</div>
+          <div class="field-group">
+            <label for="name">姓名 <span class="req">*</span></label>
+            <input type="text" id="name" required placeholder="請輸入姓名" autocomplete="name">
+          </div>
 
-    <!-- 姓名 -->
-    <div class="field-group">
-      <label>姓名 <span class="label-required">*</span></label>
-      <input type="text" id="name" required placeholder="請輸入姓名">
-    </div>
+          <div class="field-group">
+            <label for="phone">手機號碼 <span class="req">*</span></label>
+            <input
+              type="tel"
+              id="phone"
+              required
+              maxlength="10"
+              placeholder="0912345678"
+              pattern="09[0-9]{8}"
+              inputmode="numeric"
+              autocomplete="tel"
+            >
+            <p class="field-hint">請輸入 09 開頭的 10 碼手機號碼</p>
+          </div>
 
-    <!-- 手機 -->
-    <div class="field-group">
-      <label>手機號碼 <span class="label-required">*</span></label>
-      <input type="tel" id="phone" required maxlength="10" placeholder="0912345678"
-             pattern="09[0-9]{8}" inputmode="numeric">
-    </div>
+          <div class="field-group">
+            <label for="adult">人數 <span class="req">*</span></label>
+            <select id="adult" required>
+              <option value="" disabled selected>請選擇</option>
+            </select>
+          </div>
+        </section>
 
-    
-    <!-- 人數 -->
-    <div class="field-group">
-      <label>人數 <span class="label-required">*</span></label>
-      <select id="adult" required>
-        <option value="" disabled selected>請選擇</option>
-        <script>
-          document.write(
-            Array.from({length: 30}, (_, i) => i + 1)
-            .map(n => `<option value="${n}">${n} 位</option>`)
-            .join("")
-          );
-        </script>
-      </select>
-    </div>
+        <section class="form-section">
+          <h2 class="section-title">服務項目</h2>
+          <p class="section-desc">各項目請擇一；若不需要請選「無」</p>
 
-    <!-- 服務項目 -->
+          <div class="service-list">
+            <div class="field-group service-item">
+              <label for="project1">全身筋絡指壓</label>
+              <select id="project1" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="無">無</option>
+                <option value="(60分鐘)$1,000">(60分鐘) $1,000</option>
+                <option value="(90分鐘)$1,500">(90分鐘) $1,500</option>
+                <option value="(120分鐘)$2,000">(120分鐘) $2,000</option>
+              </select>
+            </div>
 
-<div class="field-group">
-  <label>全身筋絡指壓</label>
-  <select id="project1" multiple required>
-    <option value="none">無</option>
-    <option value="60">（60分鐘）$1,000</option>
-    <option value="90">（90分鐘）$1,500</option>
-    <option value="120">（120分鐘）$2,000</option>
-  </select>
-</div>
-   
-    <div class="field-group">
-      <label>全身筋絡指壓</label>
-      <select id="project1" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>無</option>
-        <option>(60分鐘)$1,000</option>
-        <option>(90分鐘)$1,500</option>
-        <option>(120分鐘)$2,000</option>
-        </select>
-    </div>
+            <div class="field-group service-item">
+              <label for="project2">全身芳療油壓</label>
+              <select id="project2" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="無">無</option>
+                <option value="(60分鐘)$1,100">(60分鐘) $1,100</option>
+              </select>
+            </div>
 
-        <div class="field-group">
-      <label>全身芳療油壓</label>
-      <select id="project2" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>無</option>
-        <option>(60分鐘)$1,100</option>
-        </select>
-    </div>
+            <div class="field-group service-item">
+              <label for="project3">全身筋絡油指壓</label>
+              <select id="project3" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="無">無</option>
+                <option value="(90分鐘)$1,600">(90分鐘) $1,600</option>
+                <option value="(120分鐘)$2,000">(120分鐘) $2,000</option>
+              </select>
+            </div>
 
-      <div class="field-group">
-      <label>全身筋絡油指壓</label>
-      <select id="project3" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>無</option>
-        <option>(90分鐘)$1,600</option>
-        <option>(120分鐘)$2,000</option>
-        </select>
-    </div>
+            <div class="field-group service-item">
+              <label for="project4">全身 SPA 去角質</label>
+              <select id="project4" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="無">無</option>
+                <option value="(60分鐘)$1,600">(60分鐘) $1,600</option>
+                <option value="(90分鐘)$2,100">(90分鐘) $2,100</option>
+                <option value="(120分鐘)$2,500">(120分鐘) $2,500</option>
+              </select>
+            </div>
 
-     <div class="field-group">
-      <label>全身SPA去角質</label>
-      <select id="project4" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>無</option>
-        <option>(60分鐘)$1,600</option>
-        <option>(90分鐘)$2,100</option>
-        <option>(120分鐘)$2,500</option>
-        </select>
-    </div>
+            <div class="field-group service-item">
+              <label for="project5">熱石能量精油舒壓</label>
+              <select id="project5" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="無">無</option>
+                <option value="(60分鐘)$2,100">(60分鐘) $2,100</option>
+                <option value="(90分鐘)$2,600">(90分鐘) $2,600</option>
+                <option value="(120分鐘)$3,000">(120分鐘) $3,000</option>
+              </select>
+            </div>
 
-         <div class="field-group">
-      <label>熱石能量精油舒壓</label>
-      <select id="project5" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>無</option>
-        <option>(60分鐘)$2,100</option>
-        <option>(90分鐘)$2,600</option>
-        <option>(120分鐘)$3,000</option>
-        </select>
-    </div>
+            <div class="field-group service-item">
+              <label for="project6">足部按摩</label>
+              <select id="project6" required>
+                <option value="" disabled selected>請選擇</option>
+                <option value="無">無</option>
+                <option value="(60分鐘)$1,000">(60分鐘) $1,000</option>
+              </select>
+            </div>
+          </div>
+        </section>
 
-       <div class="field-group">
-      <label>足部按摩</label>
-      <select id="project6" required>
-        <option value="" disabled selected>請選擇</option>
-        <option>無</option>
-        <option>(60分鐘)$1,000</option>
-      </select>
-    </div>
+        <section class="form-section form-section--last">
+          <h2 class="section-title">備註</h2>
+          <div class="field-group">
+            <label for="note">其他需求（選填）</label>
+            <textarea id="note" rows="3" placeholder="例如：希望較輕力道、身體不適部位等"></textarea>
+          </div>
+        </section>
 
-    <!-- 備註 -->
-    <div class="field-group">
-      <label>備註</label>
-      <textarea id="note" rows="3" "></textarea>
-    </div>
+        <p class="form-error" id="formError" hidden></p>
 
-    <button type="submit">送出預約</button>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          送出預約
+        </button>
+      </form>
+    </main>
+  </div>
 
-  </form>
-</div>
+  <script>
+    const ADULT_SELECT = document.getElementById("adult");
+    for (let i = 1; i <= 30; i++) {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = i + " 位";
+      ADULT_SELECT.appendChild(opt);
+    }
 
-<script>
-async function initLIFF() {
-  await liff.init({ liffId: "2010867466-OpLuakfe" });
+    async function initLIFF() {
+      try {
+        await liff.init({ liffId: "2010867466-OpLuakfe" });
 
-  if (!liff.isLoggedIn()) {
-    liff.login({ redirectUri: location.href });
-    return;
-  }
+        if (!liff.isLoggedIn()) {
+          liff.login({ redirectUri: location.href });
+          return;
+        }
 
-  const profile = await liff.getProfile();
-  const token = liff.getDecodedIDToken();
+        const profile = await liff.getProfile();
+        const token = liff.getDecodedIDToken();
 
-  document.getElementById("line_uid").value = profile.userId;
-  document.getElementById("line_email").value = token?.email || "";
-  document.getElementById("displayName").innerText = profile.displayName;
-}
+        document.getElementById("line_uid").value = profile.userId || "";
+        document.getElementById("line_email").value = token?.email || "";
 
-function initDatePicker() {
-  flatpickr("#date", {
-    locale: "zh_tw",
-    dateFormat: "Y-m-d",
-    minDate: new Date().fp_incr(1)  // 今天不可選，從明天開始
-  });
-}
+        if (profile.displayName) {
+          document.getElementById("displayName").textContent = profile.displayName;
+          document.getElementById("displayNameWrap").hidden = false;
+        }
+      } catch (err) {
+        console.error("LIFF init failed:", err);
+      }
+    }
 
-document.addEventListener("DOMContentLoaded", () => {
-  initLIFF();
-  initDatePicker();
-});
+    function initDatePicker() {
+      flatpickr("#date", {
+        locale: "zh_tw",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "Y年 m月 d日",
+        minDate: new Date().fp_incr(1),
+        disableMobile: true
+      });
+    }
 
-document.getElementById("liffForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+    function showError(message) {
+      const el = document.getElementById("formError");
+      el.textContent = message;
+      el.hidden = !message;
+    }
 
-  const params = new URLSearchParams();
+    function validateForm() {
+      const phone = document.getElementById("phone").value.trim();
+      if (!/^09\d{8}$/.test(phone)) {
+        showError("請輸入正確的手機號碼（09 開頭共 10 碼）");
+        document.getElementById("phone").focus();
+        return false;
+      }
 
-  ["line_uid","line_email","name","phone","date","time","adult","child","chair","note"]
-    .forEach(id => params.append(id.replace("line_",""), document.getElementById(id).value));
+      const projects = ["project1", "project2", "project3", "project4", "project5", "project6"];
+      const hasService = projects.some((id) => {
+        const v = document.getElementById(id).value;
+        return v && v !== "無";
+      });
 
-  location.href = "resultSend.html?" + params.toString();
-});
-</script>
+      if (!hasService) {
+        showError("請至少選擇一項服務（不可全部選「無」）");
+        document.getElementById("project1").focus();
+        return false;
+      }
 
+      showError("");
+      return true;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initLIFF();
+      initDatePicker();
+    });
+
+    document.getElementById("liffForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (!document.getElementById("liffForm").checkValidity()) {
+        document.getElementById("liffForm").reportValidity();
+        return;
+      }
+
+      if (!validateForm()) return;
+
+      const params = new URLSearchParams();
+      const fields = [
+        ["uid", "line_uid"],
+        ["email", "line_email"],
+        ["name", "name"],
+        ["phone", "phone"],
+        ["date", "date"],
+        ["slot", "slot"],
+        ["time", "time"],
+        ["adult", "adult"],
+        ["project1", "project1"],
+        ["project2", "project2"],
+        ["project3", "project3"],
+        ["project4", "project4"],
+        ["project5", "project5"],
+        ["project6", "project6"],
+        ["note", "note"]
+      ];
+
+      fields.forEach(([key, id]) => {
+        params.append(key, document.getElementById(id).value || "");
+      });
+
+      location.href = "resultSend.html?" + params.toString();
+    });
+  </script>
 </body>
 </html>
