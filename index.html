@@ -5,6 +5,9 @@
   <title>LINE 預約 SPA 按摩</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1f4d3f">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
-  <link rel="stylesheet" href="liff-spa-form.css">
+  <link rel="stylesheet" href="liff-spa-form.css?v=20260729b">
 </head>
 
 <body>
@@ -282,6 +285,8 @@
         params.append(key, document.getElementById(id).value || "");
       });
 
+      // v= 用來避開 LINE / 瀏覽器快取舊版 resultSend.html
+      params.set("v", "20260729b");
       location.href = "resultSend.html?" + params.toString();
     });
   </script>
