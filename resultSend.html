@@ -312,6 +312,52 @@
       };
     }
 
+    function loadBookingData(url) {
+      let data = null;
+
+      try {
+        const raw = sessionStorage.getItem("yasheSpaBooking");
+        if (raw) {
+          data = JSON.parse(raw);
+          sessionStorage.removeItem("yasheSpaBooking");
+        }
+      } catch (err) {
+        console.error("read sessionStorage failed:", err);
+      }
+
+      if (!data || !data.name) {
+        data = {
+          uid: getParam(url, "uid"),
+          email: getParam(url, "email"),
+          name: getParam(url, "name"),
+          phone: getParam(url, "phone"),
+          date: getParam(url, "date"),
+          slot: getParam(url, "slot"),
+          time: getParam(url, "time"),
+          adult: getParam(url, "adult"),
+          project1: getParam(url, "project1"),
+          project2: getParam(url, "project2"),
+          project3: getParam(url, "project3"),
+          project4: getParam(url, "project4"),
+          project5: getParam(url, "project5"),
+          project6: getParam(url, "project6"),
+          services: getParam(url, "services"),
+          note: getParam(url, "note") || "無"
+        };
+      }
+
+      if (!data.note) data.note = "無";
+
+      if (!data.services) {
+        data.services = Object.keys(SERVICE_LABELS)
+          .filter((key) => data[key])
+          .map((key) => SERVICE_LABELS[key] + " " + data[key])
+          .join("；");
+      }
+
+      return data;
+    }
+
     (async () => {
       try {
         await liff.init({
@@ -323,28 +369,14 @@
       }
 
       const url = new URL(location.href);
-
-      const data = {
-        uid: getParam(url, "uid"),
-        email: getParam(url, "email"),
-        name: getParam(url, "name"),
-        phone: getParam(url, "phone"),
-        date: getParam(url, "date"),
-        slot: getParam(url, "slot"),
-        time: getParam(url, "time"),
-        adult: getParam(url, "adult"),
-        project1: getParam(url, "project1"),
-        project2: getParam(url, "project2"),
-        project3: getParam(url, "project3"),
-        project4: getParam(url, "project4"),
-        project5: getParam(url, "project5"),
-        project6: getParam(url, "project6"),
-        note: getParam(url, "note") || "無"
-      };
+      const data = loadBookingData(url);
 
       try {
         await fetch(API_URL, {
           method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
           body: JSON.stringify(data)
         });
       } catch (e) {
