@@ -21,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
-  <link rel="stylesheet" href="liff-spa-form.css?v=20260729today">
+  <link rel="stylesheet" href="liff-spa-form.css?v=20260729fix">
 </head>
 
 <body>
@@ -42,7 +42,7 @@
 
         <section class="form-section">
           <h2 class="section-title">預約時間</h2>
-          <p class="section-desc">營業時間 10:00–24:00</p>
+          <p class="section-desc">營業時間 10:00–24:00（平日／假日相同；可預約當天，僅能選現在之後的時段）</p>
 
           <div class="field-group">
             <label for="date">預約日期 <span class="req">*</span></label>
@@ -505,30 +505,52 @@
 
       if (!validateForm()) return;
 
+      const SERVICE_LABELS = {
+        project1: "全身筋絡指壓",
+        project2: "全身芳療油壓",
+        project3: "全身筋絡油指壓",
+        project4: "全身SPA去角質",
+        project5: "熱石能量精油舒壓",
+        project6: "足部按摩"
+      };
+
+      const payload = {
+        uid: document.getElementById("line_uid").value || "",
+        email: document.getElementById("line_email").value || "",
+        name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        date: document.getElementById("date").value || "",
+        slot: document.getElementById("slot").value || "",
+        time: document.getElementById("time").value || "",
+        adult: document.getElementById("adult").value || "",
+        project1: document.getElementById("project1").value || "",
+        project2: document.getElementById("project2").value || "",
+        project3: document.getElementById("project3").value || "",
+        project4: document.getElementById("project4").value || "",
+        project5: document.getElementById("project5").value || "",
+        project6: document.getElementById("project6").value || "",
+        note: document.getElementById("note").value.trim() || "無"
+      };
+
+      // 先在前端組好服務項目字串，避免網址參數遺失
+      payload.services = ["project1", "project2", "project3", "project4", "project5", "project6"]
+        .filter((key) => payload[key])
+        .map((key) => SERVICE_LABELS[key] + " " + payload[key])
+        .join("；");
+
+      try {
+        sessionStorage.setItem("yasheSpaBooking", JSON.stringify(payload));
+      } catch (err) {
+        console.error("sessionStorage failed:", err);
+      }
+
+      // 網址只帶精簡參數當備援（不含易壞字元的服務明細）
       const params = new URLSearchParams();
-      const fields = [
-        ["uid", "line_uid"],
-        ["email", "line_email"],
-        ["name", "name"],
-        ["phone", "phone"],
-        ["date", "date"],
-        ["slot", "slot"],
-        ["time", "time"],
-        ["adult", "adult"],
-        ["project1", "project1"],
-        ["project2", "project2"],
-        ["project3", "project3"],
-        ["project4", "project4"],
-        ["project5", "project5"],
-        ["project6", "project6"],
-        ["note", "note"]
-      ];
-
-      fields.forEach(([key, id]) => {
-        params.append(key, document.getElementById(id).value || "");
+      ["uid", "email", "name", "phone", "date", "slot", "time", "adult", "note"].forEach((key) => {
+        params.append(key, payload[key] || "");
       });
-
-      params.set("v", "20260729today");
+      params.set("services", payload.services || "");
+      params.set("v", "20260729fix");
       location.href = "resultSend.html?" + params.toString();
     });
   </script>
