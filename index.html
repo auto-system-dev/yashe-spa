@@ -21,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
-  <link rel="stylesheet" href="liff-spa-form.css?v=20260729d">
+  <link rel="stylesheet" href="liff-spa-form.css?v=20260729e">
 </head>
 
 <body>
@@ -108,8 +108,8 @@
         </section>
 
         <section class="form-section">
-          <h2 class="section-title">服務項目</h2>
-          <p class="section-desc">請選擇需要的服務與時長（可複選多項）</p>
+          <h2 class="section-title">服務項目 <span class="req">*</span></h2>
+          <p class="section-desc">請至少選擇一項服務與時長</p>
 
           <div class="service-list">
             <div class="field-group service-item">
@@ -218,6 +218,9 @@
         document.querySelectorAll("#slotChips .chip-btn").forEach((el) => {
           el.classList.toggle("is-active", el === btn);
         });
+        document.getElementById("slotChips").classList.remove("is-invalid");
+        document.getElementById("timeGrid").classList.remove("is-invalid");
+        showError("");
 
         const times = SLOT_TIMES[slot] || [];
         timeGrid.innerHTML = times.map((t) =>
@@ -235,6 +238,7 @@
         timeGrid.querySelectorAll(".time-btn").forEach((el) => {
           el.classList.toggle("is-active", el === btn);
         });
+        timeGrid.classList.remove("is-invalid");
         showError("");
       });
     }
@@ -278,32 +282,100 @@
       const el = document.getElementById("formError");
       el.textContent = message;
       el.hidden = !message;
+      if (message) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+
+    function clearFieldErrors() {
+      document.querySelectorAll(".is-invalid").forEach((el) => {
+        el.classList.remove("is-invalid");
+      });
+    }
+
+    function markInvalid(el) {
+      if (!el) return;
+      el.classList.add("is-invalid");
+    }
+
+    function focusField(el) {
+      if (!el) return;
+      if (typeof el.focus === "function") {
+        try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+      }
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
     function validateForm() {
-      if (!document.getElementById("slot").value) {
+      clearFieldErrors();
+
+      const dateEl = document.getElementById("date");
+      const dateValue = (dateEl.value || "").trim();
+      if (!dateValue) {
+        const visibleDate = dateEl.nextElementSibling && dateEl.nextElementSibling.classList.contains("form-control")
+          ? dateEl.nextElementSibling
+          : (document.querySelector(".flatpickr-input") || dateEl);
+        markInvalid(visibleDate);
+        markInvalid(dateEl);
+        showError("請選擇預約日期");
+        focusField(visibleDate);
+        return false;
+      }
+
+      const slotEl = document.getElementById("slot");
+      if (!slotEl.value) {
+        markInvalid(document.getElementById("slotChips"));
         showError("請選擇預約時段");
+        focusField(document.getElementById("slotChips"));
         return false;
       }
 
-      if (!document.getElementById("time").value) {
+      const timeEl = document.getElementById("time");
+      if (!timeEl.value) {
+        markInvalid(document.getElementById("timeGrid"));
         showError("請選擇預約時間");
+        focusField(document.getElementById("timeGrid"));
         return false;
       }
 
-      const phone = document.getElementById("phone").value.trim();
+      const nameEl = document.getElementById("name");
+      if (!nameEl.value.trim()) {
+        markInvalid(nameEl);
+        showError("請輸入姓名");
+        focusField(nameEl);
+        return false;
+      }
+
+      const phoneEl = document.getElementById("phone");
+      const phone = phoneEl.value.trim();
+      if (!phone) {
+        markInvalid(phoneEl);
+        showError("請輸入手機號碼");
+        focusField(phoneEl);
+        return false;
+      }
       if (!/^09\d{8}$/.test(phone)) {
+        markInvalid(phoneEl);
         showError("請輸入正確的手機號碼（09 開頭共 10 碼）");
-        document.getElementById("phone").focus();
+        focusField(phoneEl);
+        return false;
+      }
+
+      const adultEl = document.getElementById("adult");
+      if (!adultEl.value) {
+        markInvalid(adultEl);
+        showError("請選擇人數");
+        focusField(adultEl);
         return false;
       }
 
       const projects = ["project1", "project2", "project3", "project4", "project5", "project6"];
       const hasService = projects.some((id) => document.getElementById(id).value);
-
       if (!hasService) {
+        projects.forEach((id) => markInvalid(document.getElementById(id)));
+        markInvalid(document.querySelector(".service-list"));
         showError("請至少選擇一項服務");
-        document.getElementById("project1").focus();
+        focusField(document.getElementById("project1"));
         return false;
       }
 
@@ -315,17 +387,27 @@
       initLIFF();
       initDatePicker();
       initSlotTimePicker();
+
+      // 填寫時清除錯誤狀態
+      document.getElementById("liffForm").addEventListener("input", (e) => {
+        if (e.target.classList.contains("is-invalid")) {
+          e.target.classList.remove("is-invalid");
+        }
+        if (!document.getElementById("formError").hidden) {
+          showError("");
+        }
+      });
+      document.getElementById("liffForm").addEventListener("change", (e) => {
+        if (e.target.classList.contains("is-invalid")) {
+          e.target.classList.remove("is-invalid");
+        }
+      });
     });
 
     document.getElementById("liffForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
       if (!validateForm()) return;
-
-      if (!document.getElementById("liffForm").checkValidity()) {
-        document.getElementById("liffForm").reportValidity();
-        return;
-      }
 
       const params = new URLSearchParams();
       const fields = [
@@ -350,8 +432,7 @@
         params.append(key, document.getElementById(id).value || "");
       });
 
-      // v= 用來避開 LINE / 瀏覽器快取舊版 resultSend.html
-      params.set("v", "20260729d");
+      params.set("v", "20260729e");
       location.href = "resultSend.html?" + params.toString();
     });
   </script>
