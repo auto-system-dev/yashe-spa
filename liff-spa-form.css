@@ -313,6 +313,24 @@ body {
   background-color: #fff;
 }
 
+.field-group input.is-invalid,
+.field-group select.is-invalid,
+.field-group textarea.is-invalid,
+.chip-row.is-invalid,
+.time-grid.is-invalid,
+.service-list.is-invalid {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.12);
+}
+
+.chip-row.is-invalid,
+.time-grid.is-invalid,
+.service-list.is-invalid {
+  border-radius: 14px;
+  padding: 6px;
+  border: 1.5px solid var(--danger);
+}
+
 .form-error {
   margin: 4px 0 12px;
   padding: 10px 12px;
