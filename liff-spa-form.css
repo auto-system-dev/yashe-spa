@@ -220,6 +220,13 @@ body {
   color: var(--accent);
 }
 
+.chip-btn:disabled,
+.chip-btn.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f3efe9;
+}
+
 .time-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
