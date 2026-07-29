@@ -21,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
-  <link rel="stylesheet" href="liff-spa-form.css?v=20260729b">
+  <link rel="stylesheet" href="liff-spa-form.css?v=20260729c">
 </head>
 
 <body>
@@ -48,21 +48,30 @@
             <input id="date" type="text" required placeholder="請選擇日期" inputmode="none" autocomplete="off">
           </div>
 
-          <div class="field-row">
-            <div class="field-group">
-              <label for="slot">預約時段 <span class="req">*</span></label>
-              <select id="slot" required>
-                <option value="" disabled selected>請選擇</option>
-                <option value="早上">早上</option>
-                <option value="下午">下午</option>
-                <option value="晚上">晚上</option>
-              </select>
+          <div class="field-group">
+            <span class="field-label">預約時段 <span class="req">*</span></span>
+            <input type="hidden" id="slot">
+            <div class="chip-row" id="slotChips" role="group" aria-label="預約時段">
+              <button type="button" class="chip-btn" data-slot="早上">
+                <span class="chip-title">早上</span>
+                <span class="chip-sub">10:00–12:00</span>
+              </button>
+              <button type="button" class="chip-btn" data-slot="下午">
+                <span class="chip-title">下午</span>
+                <span class="chip-sub">13:00–17:00</span>
+              </button>
+              <button type="button" class="chip-btn" data-slot="晚上">
+                <span class="chip-title">晚上</span>
+                <span class="chip-sub">17:00–21:00</span>
+              </button>
             </div>
+          </div>
 
-            <div class="field-group">
-              <label for="time">預約時間 <span class="req">*</span></label>
-              <input id="time" type="time" required>
-            </div>
+          <div class="field-group">
+            <span class="field-label">預約時間 <span class="req">*</span></span>
+            <input type="hidden" id="time">
+            <p class="field-hint" id="timeHint">請先選擇時段</p>
+            <div class="time-grid" id="timeGrid" hidden></div>
           </div>
         </section>
 
@@ -185,6 +194,50 @@
       ADULT_SELECT.appendChild(opt);
     }
 
+    const SLOT_TIMES = {
+      "早上": ["10:00", "10:30", "11:00", "11:30", "12:00"],
+      "下午": ["13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"],
+      "晚上": ["17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00"]
+    };
+
+    function initSlotTimePicker() {
+      const slotInput = document.getElementById("slot");
+      const timeInput = document.getElementById("time");
+      const timeGrid = document.getElementById("timeGrid");
+      const timeHint = document.getElementById("timeHint");
+
+      document.getElementById("slotChips").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-slot]");
+        if (!btn) return;
+
+        const slot = btn.dataset.slot;
+        slotInput.value = slot;
+        timeInput.value = "";
+
+        document.querySelectorAll("#slotChips .chip-btn").forEach((el) => {
+          el.classList.toggle("is-active", el === btn);
+        });
+
+        const times = SLOT_TIMES[slot] || [];
+        timeGrid.innerHTML = times.map((t) =>
+          `<button type="button" class="time-btn" data-time="${t}">${t}</button>`
+        ).join("");
+        timeGrid.hidden = false;
+        timeHint.textContent = "請選擇開始時間";
+      });
+
+      timeGrid.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-time]");
+        if (!btn) return;
+
+        timeInput.value = btn.dataset.time;
+        timeGrid.querySelectorAll(".time-btn").forEach((el) => {
+          el.classList.toggle("is-active", el === btn);
+        });
+        showError("");
+      });
+    }
+
     async function initLIFF() {
       try {
         await liff.init({ liffId: "2010867466-OpLuakfe" });
@@ -227,6 +280,16 @@
     }
 
     function validateForm() {
+      if (!document.getElementById("slot").value) {
+        showError("請選擇預約時段");
+        return false;
+      }
+
+      if (!document.getElementById("time").value) {
+        showError("請選擇預約時間");
+        return false;
+      }
+
       const phone = document.getElementById("phone").value.trim();
       if (!/^09\d{8}$/.test(phone)) {
         showError("請輸入正確的手機號碼（09 開頭共 10 碼）");
@@ -250,17 +313,18 @@
     document.addEventListener("DOMContentLoaded", () => {
       initLIFF();
       initDatePicker();
+      initSlotTimePicker();
     });
 
     document.getElementById("liffForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
+      if (!validateForm()) return;
+
       if (!document.getElementById("liffForm").checkValidity()) {
         document.getElementById("liffForm").reportValidity();
         return;
       }
-
-      if (!validateForm()) return;
 
       const params = new URLSearchParams();
       const fields = [
@@ -286,7 +350,7 @@
       });
 
       // v= 用來避開 LINE / 瀏覽器快取舊版 resultSend.html
-      params.set("v", "20260729b");
+      params.set("v", "20260729c");
       location.href = "resultSend.html?" + params.toString();
     });
   </script>
