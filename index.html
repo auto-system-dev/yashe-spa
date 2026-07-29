@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>LINE 預約 SPA 按摩</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#1f4d3f">
+  <meta name="theme-color" content="#d88a6d">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -21,13 +21,13 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
-  <link rel="stylesheet" href="liff-spa-form.css?v=20260729e">
+  <link rel="stylesheet" href="liff-spa-form.css?v=20260729yashe">
 </head>
 
 <body>
   <div class="page">
     <header class="hero">
-      <p class="hero-eyebrow">SPA Reservation</p>
+      <p class="hero-eyebrow">Yashe Spa</p>
       <h1 class="hero-title">預約 SPA 按摩</h1>
       <p class="hero-sub">請填寫預約資訊，我們會盡快為您確認時段</p>
       <p class="hero-user" id="displayNameWrap" hidden>
@@ -432,7 +432,7 @@
         params.append(key, document.getElementById(id).value || "");
       });
 
-      params.set("v", "20260729e");
+      params.set("v", "20260729yashe");
       location.href = "resultSend.html?" + params.toString();
     });
   </script>
