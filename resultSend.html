@@ -5,6 +5,9 @@
   <title>資料送出中…</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1f4d3f">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,7 +87,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyQtofbqcopsSQtjI-TqS1h4NX9QV_H_IefzhMzkZalHyiOhY_WhgDX-M2DDa9Xc5nJkg/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzzjJkXbBsx0EYNBW7v43v7DK2H6HUtmGsBSkBTs7iqq6JKVM8fa5-J8orkmqtYTWst6w/exec";
 
     const SERVICE_LABELS = {
       project1: "全身筋絡指壓",
@@ -99,16 +102,212 @@
       return (url.searchParams.get(key) || "").trim();
     }
 
-    function buildServiceLines(data) {
-      return Object.keys(SERVICE_LABELS)
-        .filter((key) => data[key])
-        .map((key) => `・${SERVICE_LABELS[key]}：${data[key]}`);
-    }
-
     function setStatus(title, text, done) {
       document.querySelector("#statusCard h1").textContent = title;
       document.getElementById("statusText").textContent = text;
       if (done) document.getElementById("statusCard").classList.add("is-done");
+    }
+
+    function infoRow(label, value) {
+      return {
+        type: "box",
+        layout: "baseline",
+        spacing: "sm",
+        contents: [
+          {
+            type: "text",
+            text: label,
+            color: "#8A9A93",
+            size: "sm",
+            flex: 2,
+            wrap: true
+          },
+          {
+            type: "text",
+            text: value || "-",
+            color: "#1C2B26",
+            size: "sm",
+            flex: 5,
+            wrap: true,
+            weight: "bold"
+          }
+        ]
+      };
+    }
+
+    function buildServiceRows(data) {
+      const rows = Object.keys(SERVICE_LABELS)
+        .filter((key) => data[key])
+        .map((key) => ({
+          type: "box",
+          layout: "vertical",
+          spacing: "xs",
+          margin: "sm",
+          contents: [
+            {
+              type: "text",
+              text: SERVICE_LABELS[key],
+              size: "sm",
+              color: "#2F6B57",
+              weight: "bold",
+              wrap: true
+            },
+            {
+              type: "text",
+              text: data[key],
+              size: "sm",
+              color: "#555555",
+              wrap: true
+            }
+          ]
+        }));
+
+      if (!rows.length) {
+        rows.push({
+          type: "text",
+          text: "尚未選擇服務",
+          size: "sm",
+          color: "#999999"
+        });
+      }
+
+      return rows;
+    }
+
+    function buildFlexMessage(data) {
+      return {
+        type: "flex",
+        altText: "SPA 預約確認｜" + data.date + " " + data.time,
+        contents: {
+          type: "bubble",
+          size: "mega",
+          header: {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#1F4D3F",
+            paddingAll: "20px",
+            contents: [
+              {
+                type: "text",
+                text: "SPA RESERVATION",
+                color: "#A8C5B8",
+                size: "xs",
+                weight: "bold"
+              },
+              {
+                type: "text",
+                text: "預約已送出",
+                color: "#FFFFFF",
+                size: "xl",
+                weight: "bold",
+                margin: "md"
+              },
+              {
+                type: "text",
+                text: "我們已收到您的預約，將盡快與您確認",
+                color: "#D5E0DA",
+                size: "xs",
+                margin: "sm",
+                wrap: true
+              }
+            ]
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "lg",
+            paddingAll: "20px",
+            backgroundColor: "#FFFCF8",
+            contents: [
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "預約資訊",
+                    weight: "bold",
+                    size: "md",
+                    color: "#1C2B26"
+                  },
+                  infoRow("姓名", data.name),
+                  infoRow("手機", data.phone),
+                  infoRow("日期", data.date),
+                  infoRow("時段", data.slot),
+                  infoRow("時間", data.time),
+                  infoRow("人數", (data.adult || "-") + " 位")
+                ]
+              },
+              {
+                type: "separator",
+                color: "#D5E0DA"
+              },
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "服務項目",
+                    weight: "bold",
+                    size: "md",
+                    color: "#1C2B26"
+                  }
+                ].concat(buildServiceRows(data))
+              },
+              {
+                type: "separator",
+                color: "#D5E0DA"
+              },
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "備註",
+                    weight: "bold",
+                    size: "md",
+                    color: "#1C2B26"
+                  },
+                  {
+                    type: "text",
+                    text: data.note || "無",
+                    size: "sm",
+                    color: "#555555",
+                    wrap: true
+                  }
+                ]
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            paddingAll: "16px",
+            backgroundColor: "#F4F7F5",
+            contents: [
+              {
+                type: "text",
+                text: "如需修改，請私訊或來電聯繫我們",
+                size: "xs",
+                color: "#8A9A93",
+                align: "center",
+                wrap: true
+              }
+            ]
+          },
+          styles: {
+            footer: {
+              separator: true
+            }
+          }
+        }
+      };
     }
 
     (async () => {
@@ -141,7 +340,6 @@
         note: getParam(url, "note") || "無"
       };
 
-      /* 1. 寫入 Google Sheet */
       try {
         await fetch(API_URL, {
           method: "POST",
@@ -151,39 +349,13 @@
         console.error("試算表寫入錯誤:", e);
       }
 
-      /* 2. 若不在 LINE App 內 */
       if (!liff.isInClient()) {
         setStatus("資料已送出", "請回到 LINE App 查看確認訊息。", true);
         return;
       }
 
-      /* 3. 傳文字訊息 */
-      const serviceLines = buildServiceLines(data);
-      const serviceBlock = serviceLines.length
-        ? serviceLines.join("\n")
-        : "・尚未選擇服務";
-
-      const msg =
-`📌 您的 SPA 預約資訊
-
-👤 姓名：${data.name}
-📱 手機：${data.phone}
-📅 日期：${data.date}
-🕐 時段：${data.slot}
-⏰ 時間：${data.time}
-🧑 人數：${data.adult} 位
-
-💆 服務項目
-${serviceBlock}
-
-📝 備註：${data.note}
-
-我們已收到您的預約，將盡快與您確認！`;
-
       try {
-        await liff.sendMessages([
-          { type: "text", text: msg }
-        ]);
+        await liff.sendMessages([buildFlexMessage(data)]);
       } catch (e) {
         alert("訊息發送失敗：" + e);
         console.error(e);
